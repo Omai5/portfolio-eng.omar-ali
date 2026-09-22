@@ -1,6 +1,6 @@
 <div align="center">
 
-<img src="readme-assets/readme-visual-map.gif" width="100%" alt="Omar Ali animated particle profile visual">
+<img src="readme-assets/readme-visual-map.gif" width="1100" alt="Omar Ali animated 1-bit particle profile visual">
 
 <br>
 
