@@ -1,23 +1,18 @@
 <div align="center">
 
-<picture>
-  <source media="(prefers-color-scheme: dark)" srcset="readme-assets/readme-banner-dark.svg">
-  <source media="(prefers-color-scheme: light)" srcset="readme-assets/readme-banner-light.svg">
-  <img src="readme-assets/readme-banner-dark.svg" width="100%" alt="Omar Ali profile banner">
-</picture>
+<img src="readme-assets/readme-visual-map.gif" width="100%" alt="Omar Ali animated particle profile visual">
 
 <br>
 
 <a href="https://github.com/Omai5">
-  <img src="https://readme-typing-svg.demolab.com?font=JetBrains+Mono&weight=600&size=26&duration=2600&pause=900&color=AA9BEF&center=true&vCenter=true&width=880&lines=Omar+Ali+-+Software+Engineer+%26+Cloud+Computing;Backend+Engineering+%7C+System+Design+%7C+Architecture;Building+systems+with+engineering+in+mind" alt="typing banner">
+  <img src="https://readme-typing-svg.demolab.com?font=JetBrains+Mono&weight=600&size=26&duration=2600&pause=900&color=AA9BEF&center=true&vCenter=true&width=880&lines=Omar+Ali+-+Software+Engineer;Backend+Engineering+%7C+System+Design+%7C+Architecture;Building+systems+with+engineering+in+mind" alt="typing banner">
 </a>
 
 <br>
 
 <a href="https://github.com/Omai5"><img src="https://img.shields.io/badge/GitHub-0d1117?style=for-the-badge&logo=github&logoColor=white" alt="GitHub"></a>&nbsp;&nbsp;
 <a href="https://www.linkedin.com/in/omar-ali-4074673b7/"><img src="https://img.shields.io/badge/LinkedIn-0A66C2?style=for-the-badge&logo=linkedin&logoColor=white" alt="LinkedIn"></a>&nbsp;&nbsp;
-<a href="https://www.facebook.com/omar.ali.761594/"><img src="https://img.shields.io/badge/Facebook-0d1117?style=for-the-badge&logo=facebook&logoColor=AA9BEF" alt="Facebook"></a>
-&nbsp;&nbsp;
+<a href="https://www.facebook.com/omar.ali.761594/"><img src="https://img.shields.io/badge/Facebook-0d1117?style=for-the-badge&logo=facebook&logoColor=AA9BEF" alt="Facebook"></a>&nbsp;&nbsp;
 <a href="https://portfolio-eng-omar-ali.vercel.app/"><img src="https://img.shields.io/badge/Portfolio-0d1117?style=for-the-badge&logo=vercel&logoColor=AA9BEF" alt="Portfolio"></a>
 
 <br>
@@ -30,7 +25,7 @@
 
 ## This is me
 
-Hi, I'm **Omar Ali**, a **Software Engineer & Cloud Computing** student focused on backend engineering, APIs, system design, software architecture, and scalable systems.
+Hi, I'm **Omar Ali**, a **Software Engineer** focused on backend engineering, APIs, system design, software architecture, and scalable systems.
 
 - **3+ Years** of software development experience through continuous learning, hands-on projects, and practical application
 - Focused on **backend engineering, APIs, system design, and scalable architectures**
