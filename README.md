@@ -1,9 +1,9 @@
 <div align="center">
 
 <picture>
-  <source media="(prefers-color-scheme: dark)" srcset="assets/banner-dark.svg">
-  <source media="(prefers-color-scheme: light)" srcset="assets/banner-light.svg">
-  <img src="assets/banner-dark.svg" width="100%" alt="Omar Ali profile banner">
+  <source media="(prefers-color-scheme: dark)" srcset="readme-assets/readme-banner-dark.svg">
+  <source media="(prefers-color-scheme: light)" srcset="readme-assets/readme-banner-light.svg">
+  <img src="readme-assets/readme-banner-dark.svg" width="100%" alt="Omar Ali profile banner">
 </picture>
 
 <br>
@@ -57,18 +57,18 @@ Hi, I'm **Omar Ali**, a **Software Engineer & Cloud Computing** student focused 
 <td width="50%" align="center" valign="middle">
 
 <picture>
-  <source media="(prefers-color-scheme: dark)" srcset="assets/radar-dark.svg">
-  <source media="(prefers-color-scheme: light)" srcset="assets/radar-light.svg">
-  <img src="assets/radar-dark.svg" width="400" alt="engineering focus map">
+  <source media="(prefers-color-scheme: dark)" srcset="readme-assets/readme-radar-dark.svg">
+  <source media="(prefers-color-scheme: light)" srcset="readme-assets/readme-radar-light.svg">
+  <img src="readme-assets/readme-radar-dark.svg" width="400" alt="engineering focus map">
 </picture>
 
 </td>
 <td width="50%" align="center" valign="middle">
 
 <picture>
-  <source media="(prefers-color-scheme: dark)" srcset="assets/radar-langs-dark.svg">
-  <source media="(prefers-color-scheme: light)" srcset="assets/radar-langs-light.svg">
-  <img src="assets/radar-langs-dark.svg" width="400" alt="programming language map">
+  <source media="(prefers-color-scheme: dark)" srcset="readme-assets/readme-radar-langs-dark.svg">
+  <source media="(prefers-color-scheme: light)" srcset="readme-assets/readme-radar-langs-light.svg">
+  <img src="readme-assets/readme-radar-langs-dark.svg" width="400" alt="programming language map">
 </picture>
 
 </td>
@@ -84,14 +84,14 @@ Hi, I'm **Omar Ali**, a **Software Engineer & Cloud Computing** student focused 
 ## Numbers matter
 
 <picture>
-  <source media="(prefers-color-scheme: dark)" srcset="assets/card-stats-dark.svg">
-  <source media="(prefers-color-scheme: light)" srcset="assets/card-stats-light.svg">
-  <img src="assets/card-stats-dark.svg" width="480" alt="GitHub statistics">
+  <source media="(prefers-color-scheme: dark)" srcset="readme-assets/readme-card-stats-dark.svg">
+  <source media="(prefers-color-scheme: light)" srcset="readme-assets/readme-card-stats-light.svg">
+  <img src="readme-assets/readme-card-stats-dark.svg" width="480" alt="GitHub statistics">
 </picture>
 
 <br>
 
-<img src="assets/metrics.languages.svg" height="165" alt="GitHub language metrics">
+<img src="readme-assets/readme-metrics-languages.svg" height="165" alt="GitHub language metrics">
 
 </div>
 
@@ -102,4 +102,3 @@ Hi, I'm **Omar Ali**, a **Software Engineer & Cloud Computing** student focused 
 <sub>` Build with code · @Omai5 `</sub>
 
 </div>
-
