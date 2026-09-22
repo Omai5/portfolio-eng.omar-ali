@@ -17,6 +17,8 @@
 <a href="https://github.com/Omai5"><img src="https://img.shields.io/badge/GitHub-0d1117?style=for-the-badge&logo=github&logoColor=white" alt="GitHub"></a>&nbsp;&nbsp;
 <a href="https://www.linkedin.com/in/omar-ali-4074673b7/"><img src="https://img.shields.io/badge/LinkedIn-0A66C2?style=for-the-badge&logo=linkedin&logoColor=white" alt="LinkedIn"></a>&nbsp;&nbsp;
 <a href="https://www.facebook.com/omar.ali.761594/"><img src="https://img.shields.io/badge/Facebook-0d1117?style=for-the-badge&logo=facebook&logoColor=AA9BEF" alt="Facebook"></a>
+&nbsp;&nbsp;
+<a href="https://portfolio-eng-omar-ali.vercel.app/"><img src="https://img.shields.io/badge/Portfolio-0d1117?style=for-the-badge&logo=vercel&logoColor=AA9BEF" alt="Portfolio"></a>
 
 <br>
 
