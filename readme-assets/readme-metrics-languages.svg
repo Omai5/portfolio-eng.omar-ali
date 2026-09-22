@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="760" height="165" viewBox="0 0 760 165">
+<rect width="760" height="165" rx="18" fill="#0d1117"/>
+<text x="30" y="38" fill="#f0f6fc" font-family="JetBrains Mono,monospace" font-size="22" font-weight="700">ENGINEERING LANGUAGES</text>
+<text x="30" y="72" fill="#8b949e" font-family="JetBrains Mono,monospace" font-size="15">JavaScript · Go · Rust · C++ · C · PHP</text>
+<g font-family="JetBrains Mono,monospace" font-size="13" font-weight="700">
+<text x="30" y="112" fill="#aa9bef">JS</text><text x="145" y="112" fill="#aa9bef">GO</text><text x="260" y="112" fill="#aa9bef">RUST</text><text x="395" y="112" fill="#aa9bef">C++</text><text x="510" y="112" fill="#aa9bef">C</text><text x="625" y="112" fill="#aa9bef">PHP</text>
+</g>
+<text x="30" y="142" fill="#8b949e" font-family="JetBrains Mono,monospace" font-size="12">STACK MAP · NOT A SELF-RATED PROFICIENCY SCORE</text>
+</svg>

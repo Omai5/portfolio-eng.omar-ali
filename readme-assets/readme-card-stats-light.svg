@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="300" viewBox="0 0 900 300">
+<rect x="2" y="2" width="896" height="296" rx="22" fill="#ffffff" stroke="#d0d7de" stroke-width="2"/>
+<text x="48" y="58" fill="#24292f" font-family="JetBrains Mono,monospace" font-size="28" font-weight="700">GITHUB.SIGNALS</text>
+<text x="48" y="92" fill="#57606a" font-family="JetBrains Mono,monospace" font-size="16">@Omai5 · generated from GitHub</text>
+<line x1="48" y1="118" x2="852" y2="118" stroke="#d0d7de"/>
+<g font-family="JetBrains Mono,monospace">
+<text x="72" y="170" fill="#57606a" font-size="16">PUBLIC REPOS</text><text x="72" y="208" fill="#aa9bef" font-size="32" font-weight="700">0</text>
+<text x="300" y="170" fill="#57606a" font-size="16">STARS</text><text x="300" y="208" fill="#aa9bef" font-size="32" font-weight="700">0</text>
+<text x="500" y="170" fill="#57606a" font-size="16">FORKS</text><text x="500" y="208" fill="#aa9bef" font-size="32" font-weight="700">0</text>
+<text x="690" y="170" fill="#57606a" font-size="16">FOLLOWERS</text><text x="690" y="208" fill="#aa9bef" font-size="32" font-weight="700">0</text>
+</g>
+<text x="48" y="258" fill="#57606a" font-family="JetBrains Mono,monospace" font-size="14">PROFILE.SH · LIVE DATA</text>
+</svg>
