@@ -9,7 +9,6 @@ import React, {
   useRef,
   useState,
 } from "react";
-import { ScrollArea } from "./scroll-area";
 
 interface ModalContextType {
   open: boolean;
@@ -111,7 +110,7 @@ export const ModalBody = ({
           <motion.div
             ref={modalRef}
             className={cn(
-              "min-h-[50%] max-h-[90%] md:max-w-[40%] bg-white dark:bg-neutral-950 border border-transparent dark:border-neutral-800 md:rounded-2xl relative z-50 flex flex-col flex-1 overflow-hidden",
+              "w-[calc(100%-2rem)] max-h-[85dvh] md:max-w-[40%] bg-white dark:bg-neutral-950 border border-transparent dark:border-neutral-800 rounded-2xl relative z-50 flex flex-col overflow-hidden",
               className
             )}
             initial={{
@@ -138,9 +137,13 @@ export const ModalBody = ({
             }}
           >
             <CloseIcon />
-            <ScrollArea className="h-[80dvh] w-full rounded-md border">
+            {/* Height follows content up to max-h; footer stays pinned while body scrolls */}
+            <div
+              data-lenis-prevent
+              className="flex-1 min-h-0 w-full overflow-y-auto overscroll-contain"
+            >
               {children}
-            </ScrollArea>
+            </div>
           </motion.div>
         </motion.div>
       )}
@@ -172,7 +175,7 @@ export const ModalFooter = ({
   return (
     <div
       className={cn(
-        "flex justify-end p-4 bg-gray-100 dark:bg-neutral-900",
+        "sticky bottom-0 flex justify-end p-4 bg-gray-100 dark:bg-neutral-900",
         className
       )}
     >
@@ -207,7 +210,7 @@ const CloseIcon = () => {
   return (
     <button
       onClick={() => setOpen(false)}
-      className="absolute top-4 right-4 group z-[9999]"
+      className="absolute top-3 right-3 p-2 group z-[9999]"
     >
       <svg
         xmlns="http://www.w3.org/2000/svg"
