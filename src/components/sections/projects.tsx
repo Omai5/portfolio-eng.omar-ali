@@ -11,6 +11,8 @@ import {
 } from "../ui/animated-modal";
 import { FloatingDock } from "../ui/floating-dock";
 import Link from "next/link";
+import { Lock } from "lucide-react";
+import ProjectCover from "../ui/project-cover";
 
 import SmoothScroll from "../smooth-scroll";
 import projects, { Project, Skill } from "@/data/projects";
@@ -21,12 +23,12 @@ import SectionWrapper from "../ui/section-wrapper";
 
 const ProjectsSection = () => {
   return (
-    <SectionWrapper id="projects" className="max-w-7xl mx-auto md:h-[130dvh]">
+    <SectionWrapper id="projects" className="max-w-7xl mx-auto md:min-h-[130dvh]">
       <SectionHeader id='projects' title="Projects" />
       {projects.length > 0 ? (
-        <div className="grid grid-cols-1 md:grid-cols-3">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-y-8">
           {projects.map((project) => (
-            <Modall key={project.src} project={project} />
+            <Modall key={project.id} project={project} />
           ))}
         </div>
       ) : (
@@ -48,13 +50,25 @@ const Modall = ({ project }: { project: Project }) => {
             className="relative w-[calc(100vw-3rem)] sm:w-[350px] md:w-[400px] h-auto rounded-lg overflow-hidden mx-auto"
             style={{ aspectRatio: "3/2" }}
           >
-            <Image
-              className="absolute w-full h-full top-0 left-0 hover:scale-[1.05] transition-all"
-              src={project.src}
-              alt={project.title}
-              width={300}
-              height={300}
-            />
+            {project.src ? (
+              <Image
+                className="absolute w-full h-full top-0 left-0 object-cover hover:scale-[1.05] transition-all"
+                src={project.src}
+                alt={project.title}
+                width={400}
+                height={267}
+              />
+            ) : (
+              <ProjectCover
+                project={project}
+                className="hover:scale-[1.05] transition-all"
+              />
+            )}
+            {project.comingSoon && (
+              <div className="absolute top-3 right-3 z-10 rounded-full bg-amber-400 px-2.5 py-0.5 text-xs font-semibold text-black">
+                Coming Soon
+              </div>
+            )}
             <div className="absolute w-full h-1/2 bottom-0 left-0 bg-gradient-to-t from-black via-black/85 to-transparent pointer-events-none">
               <div className="flex flex-col h-full items-start justify-end p-6">
                 <div className="text-lg text-left">{project.title}</div>
@@ -73,6 +87,18 @@ const Modall = ({ project }: { project: Project }) => {
           </SmoothScroll>
           <ModalFooter className="gap-3">
             <CancelButton />
+            {project.comingSoon && (
+              <button
+                type="button"
+                disabled
+                aria-disabled="true"
+                title="This project is still in progress"
+                className="flex-1 sm:flex-none sm:w-28 inline-flex items-center justify-center gap-1.5 bg-neutral-300 text-neutral-500 dark:bg-neutral-800 dark:text-neutral-500 text-sm px-2 py-2 rounded-md border border-neutral-300 dark:border-neutral-700 cursor-not-allowed"
+              >
+                <Lock size={14} />
+                Visit
+              </button>
+            )}
             {project.live && (
               <Link
                 href={project.live}
@@ -102,17 +128,36 @@ const Modall = ({ project }: { project: Project }) => {
 export default ProjectsSection;
 
 const ProjectContents = ({ project }: { project: Project }) => {
+  if (project.comingSoon) {
+    return (
+      <div className="flex flex-col items-center text-center gap-4 py-10">
+        <h4 className="text-lg md:text-2xl text-neutral-600 dark:text-neutral-100 font-bold">
+          {project.title}
+        </h4>
+        <span className="rounded-full bg-amber-400 px-3 py-1 text-sm font-semibold text-black">
+          Coming Soon 🚧
+        </span>
+        <p className="max-w-md font-sans text-sm md:text-base text-neutral-600 dark:text-neutral-300">
+          I&apos;m currently working on this project. It will be available
+          here soon. Stay tuned!
+        </p>
+      </div>
+    );
+  }
+
+  const frontend = project.skills?.frontend ?? [];
+  const backend = project.skills?.backend ?? [];
   return (
     <>
       <h4 className="text-lg md:text-2xl text-neutral-600 dark:text-neutral-100 font-bold text-center mb-8">
         {project.title}
       </h4>
       <div className="flex flex-col md:flex-row md:justify-evenly gap-6 mb-8">
-        {project.skills.frontend?.length > 0 && (
-          <SkillGroup label="Frontend" skills={project.skills.frontend} />
+        {frontend.length > 0 && (
+          <SkillGroup label="Frontend" skills={frontend} />
         )}
-        {project.skills.backend?.length > 0 && (
-          <SkillGroup label="Backend" skills={project.skills.backend} />
+        {backend.length > 0 && (
+          <SkillGroup label="Backend" skills={backend} />
         )}
       </div>
       {/* <div className="flex justify-center items-center">

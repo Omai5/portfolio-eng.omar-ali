@@ -9,6 +9,8 @@ import {
 } from "@/components/ui/card";
 import ContactForm from "../ContactForm";
 import { config } from "@/data/config";
+import { FaWhatsapp } from "react-icons/fa";
+import { Phone } from "lucide-react";
 import { SectionHeader } from "./section-header";
 import SectionWrapper from "../ui/section-wrapper";
 
@@ -35,6 +37,24 @@ const ContactSection = () => {
               </a>{" "}
               or drop your info here.
             </CardDescription>
+            <div className="flex flex-wrap gap-2 pt-3">
+              <a
+                href={config.whatsapp}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 rounded-md border border-green-500/40 bg-green-500/10 px-3 py-1.5 text-sm text-green-600 dark:text-green-400 hover:bg-green-500/20 transition-colors"
+              >
+                <FaWhatsapp className="h-4 w-4" />
+                WhatsApp
+              </a>
+              <a
+                href={`tel:${config.phoneIntl}`}
+                className="inline-flex items-center gap-2 rounded-md border border-neutral-500/40 px-3 py-1.5 text-sm hover:bg-neutral-500/10 transition-colors"
+              >
+                <Phone className="h-4 w-4" />
+                {config.phone}
+              </a>
+            </div>
           </CardHeader>
           <CardContent>
             <ContactForm />

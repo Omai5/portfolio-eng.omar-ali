@@ -20,7 +20,34 @@ interface ChatMessageListProps {
   isSingleUser: boolean;
   typingUsers: Map<string, { username: string }>;
   getTypingText: () => string | null;
+  offline?: boolean;
 }
+
+// Turns URLs, emails and phone numbers inside a message into links
+const LINK_RE = /(https?:\/\/[^\s]+|[\w.+-]+@[\w-]+\.[\w.-]+|\b0\d{10}\b)/g;
+const Linkified = ({ text }: { text: string }) => (
+  <>
+    {text.split(LINK_RE).map((part, i) => {
+      if (i % 2 === 0) return part;
+      const href = part.startsWith("http")
+        ? part
+        : part.includes("@")
+          ? `mailto:${part}`
+          : `tel:+2${part}`;
+      return (
+        <a
+          key={i}
+          href={href}
+          target={part.startsWith("http") ? "_blank" : undefined}
+          rel="noopener noreferrer"
+          className="text-[#00a8fc] hover:underline break-all"
+        >
+          {part}
+        </a>
+      );
+    })}
+  </>
+);
 
 export const ChatMessageList = ({
   msgs,
@@ -32,13 +59,27 @@ export const ChatMessageList = ({
   scrollToBottom,
   isSingleUser,
   typingUsers,
-  getTypingText
+  getTypingText,
+  offline = false,
 }: ChatMessageListProps) => {
   return (
     <div className="flex-1 relative overflow-hidden flex flex-col">
       <ScrollArea className="h-[400px]" data-lenis-prevent ref={chatContainerRef} type="always">
         <div className="p-4 space-y-0">
-          {msgs.length === 0 && (
+          {msgs.length === 0 && offline && (
+            <div className="h-full flex flex-col items-center justify-center text-center space-y-3 opacity-80 mt-10">
+              <div className={cn("w-16 h-16 rounded-full flex items-center justify-center mb-2 text-3xl", THEME.bg.welcome)}>
+                👋
+              </div>
+              <h3 className={cn("text-xl font-bold", THEME.text.header)}>Say hi!</h3>
+              <p className={cn("text-sm max-w-[230px]", THEME.text.secondary)}>
+                Send me a message here and it goes straight to my inbox.
+                I&apos;ll reply as soon as I can.
+              </p>
+            </div>
+          )}
+
+          {msgs.length === 0 && !offline && (
             <div className="h-full flex flex-col items-center justify-center text-center space-y-3 opacity-70 mt-10">
               <div className={cn("w-16 h-16 rounded-full flex items-center justify-center mb-2", THEME.bg.welcome)}>
                 <Hash className={cn("w-10 h-10", THEME.text.header)} />
@@ -99,7 +140,7 @@ export const ChatMessageList = ({
                     </div>
                   )}
                   <p className={cn("whitespace-pre-wrap break-words leading-[1.375rem] text-sm font-light", THEME.text.primary, !showHeader && "pl-0")}>
-                    {msg.content}
+                    <Linkified text={msg.content} />
                   </p>
                 </div>
               </div>

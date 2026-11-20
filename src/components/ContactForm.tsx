@@ -33,8 +33,8 @@ const ContactForm = () => {
           message,
         }),
       });
-      const data = await res.json();
-      if (data.error) throw new Error(data.error);
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(data.error || "Something went wrong!");
       toast({
         title: "Thank you!",
         description: "I'll get back to you as soon as possible.",
@@ -52,7 +52,10 @@ const ContactForm = () => {
     } catch (err) {
       toast({
         title: "Error",
-        description: "Something went wrong! Please check the fields.",
+        description:
+          err instanceof Error && err.message
+            ? `${err.message} You can also reach me on WhatsApp or by email.`
+            : "Something went wrong! Please check the fields.",
         className: cn(
           "top-0 w-full flex justify-center fixed md:max-w-7xl md:top-4 md:right-4"
         ),

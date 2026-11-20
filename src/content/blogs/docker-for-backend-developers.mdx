@@ -1,0 +1,104 @@
+---
+title: "Docker for Backend Developers: From Dev to Production"
+publishedAt: "2026-10-05"
+summary: "How I containerize a backend service with small, secure images, and run it locally with its database using Docker Compose."
+author: "Omar Ali"
+tags: ["Docker", "DevOps", "Backend"]
+---
+
+"It works on my machine" stops being a problem once your machine and the server run the **same container**. Here is the setup I use for most backend services.
+
+## A production-ready Dockerfile
+
+The key idea is a **multi-stage build**: install and build in one stage, then copy only what is needed into a small final image.
+
+```dockerfile
+# ---- build stage ----
+FROM node:20-alpine AS build
+WORKDIR /app
+COPY package*.json ./
+RUN npm ci
+COPY . .
+RUN npm run build
+
+# ---- runtime stage ----
+FROM node:20-alpine
+WORKDIR /app
+ENV NODE_ENV=production
+COPY package*.json ./
+RUN npm ci --omit=dev
+COPY --from=build /app/dist ./dist
+
+# never run as root
+USER node
+EXPOSE 3000
+CMD ["node", "dist/server.js"]
+```
+
+Why this matters:
+
+- **Smaller image**: build tools and dev dependencies never reach production.
+- **Faster builds**: copying `package*.json` first lets Docker cache the dependency layer.
+- **Safer**: the app runs as a non-root user.
+
+## Don't forget .dockerignore
+
+Without it, `COPY . .` sends everything to the build, including secrets.
+
+```text
+node_modules
+.git
+.env
+dist
+*.log
+```
+
+## Local development with Docker Compose
+
+Compose starts the API and its database together with one command:
+
+```yaml
+services:
+  api:
+    build: .
+    ports:
+      - "3000:3000"
+    environment:
+      DATABASE_URL: postgres://app:secret@db:5432/app
+    depends_on:
+      db:
+        condition: service_healthy
+
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: app
+      POSTGRES_PASSWORD: secret
+      POSTGRES_DB: app
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U app"]
+      interval: 5s
+      retries: 5
+
+volumes:
+  pgdata:
+```
+
+Run `docker compose up --build` and the whole stack is ready. Notice the API connects to the host `db`: inside Compose, every service is reachable by its name.
+
+## Configuration through environment variables
+
+Never bake secrets into the image. Read them from environment variables at runtime, so the **same image** can run in development, staging, and production with different settings.
+
+## A few habits that pay off
+
+1. Pin image versions (`postgres:16-alpine`, not `postgres:latest`).
+2. Add a `/health` endpoint and a `HEALTHCHECK` so orchestrators know when your app is ready.
+3. Log to stdout and stderr, and let the platform collect the logs.
+4. Scan images for vulnerabilities in CI before pushing them.
+
+## Wrapping up
+
+A good Dockerfile is small, cached, and runs as a non-root user. Combined with Compose for local development, it gives every developer the same environment in minutes, and makes the jump to Kubernetes or any cloud platform much easier.
