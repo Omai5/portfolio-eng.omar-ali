@@ -34,7 +34,12 @@ const ContactForm = () => {
         }),
       });
       const data = await res.json().catch(() => ({}));
-      if (!res.ok) throw new Error(data.error || "Something went wrong!");
+      if (!res.ok) {
+        // Only point to other channels when the server failed, not for input mistakes
+        const hint =
+          res.status >= 500 ? " You can also reach me on WhatsApp or by email." : "";
+        throw new Error((data.error || "Something went wrong!") + hint);
+      }
       toast({
         title: "Thank you!",
         description: "I'll get back to you as soon as possible.",
@@ -54,7 +59,7 @@ const ContactForm = () => {
         title: "Error",
         description:
           err instanceof Error && err.message
-            ? `${err.message} You can also reach me on WhatsApp or by email.`
+            ? err.message
             : "Something went wrong! Please check the fields.",
         className: cn(
           "top-0 w-full flex justify-center fixed md:max-w-7xl md:top-4 md:right-4"
@@ -96,6 +101,8 @@ const ContactForm = () => {
           placeholder="Tell me about about your project,"
           id="content"
           required
+          minLength={10}
+          maxLength={5000}
           value={message}
           onChange={(e) => setMessage(e.target.value)}
         />

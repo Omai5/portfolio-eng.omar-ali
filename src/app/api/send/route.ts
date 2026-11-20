@@ -5,7 +5,11 @@ import { z } from "zod";
 const Email = z.object({
   fullName: z.string().trim().min(2, "Full name is invalid!").max(100),
   email: z.string().trim().email({ message: "Email is invalid!" }),
-  message: z.string().trim().min(10, "Message is too short!").max(5000),
+  message: z
+    .string()
+    .trim()
+    .min(10, "Your message is too short, please write at least 10 characters.")
+    .max(5000),
 });
 
 export async function POST(req: Request) {
