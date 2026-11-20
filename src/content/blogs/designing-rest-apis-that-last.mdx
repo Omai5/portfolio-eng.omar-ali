@@ -1,0 +1,76 @@
+---
+title: "Designing REST APIs That Last"
+publishedAt: "2026-09-14"
+summary: "Practical rules I follow to build REST APIs that stay clean, predictable, and easy to evolve as a product grows."
+author: "Omar Ali"
+tags: ["Backend", "API Design", "REST"]
+---
+
+An API is a contract. Once other teams or apps depend on it, every inconsistency becomes something you have to support forever. These are the rules I follow to keep APIs boring, in the best way.
+
+## 1. Model resources, not actions
+
+URLs should describe **things**, and HTTP methods should describe **what you do** to them.
+
+```http
+GET    /orders          # list orders
+POST   /orders          # create an order
+GET    /orders/42       # read one order
+PATCH  /orders/42       # update part of it
+DELETE /orders/42       # delete it
+```
+
+Avoid verbs in paths like `/getOrders` or `/createOrder`. When something truly is an action, model it as a sub-resource: `POST /orders/42/cancel`.
+
+## 2. Use status codes honestly
+
+Clients make decisions based on status codes, so do not return `200` with an error inside the body.
+
+- `200 OK` / `201 Created` / `204 No Content` for success
+- `400 Bad Request` for invalid input
+- `401 Unauthorized` when the user is not logged in, `403 Forbidden` when they are but cannot do this
+- `404 Not Found`, `409 Conflict`, `422 Unprocessable Entity`
+- `429 Too Many Requests` when rate limited
+- `500` only for bugs on your side
+
+## 3. One error format everywhere
+
+Pick a single error shape and use it in every endpoint:
+
+```json
+{
+  "error": {
+    "code": "VALIDATION_FAILED",
+    "message": "Email is invalid",
+    "details": [{ "field": "email", "issue": "format" }]
+  }
+}
+```
+
+A stable `code` lets the frontend react to errors without parsing human-readable messages.
+
+## 4. Validate at the edge
+
+Never trust input. Validate the body, query, and params **before** they reach your business logic. In Node.js I use `zod`, in Laravel Form Requests, in Go a small validation layer. The rule is the same: invalid data never gets past the controller.
+
+## 5. Paginate from day one
+
+Every list endpoint will grow. Add pagination before it hurts:
+
+```http
+GET /orders?limit=20&cursor=eyJpZCI6NDJ9
+```
+
+Cursor-based pagination stays fast on large tables and does not skip or duplicate rows when new data is inserted, unlike plain `OFFSET`.
+
+## 6. Version without breaking people
+
+Adding fields is safe. Removing or renaming them is not. When you must break the contract, introduce a new version (`/v2/orders`) and give clients time to migrate.
+
+## 7. Make writes idempotent where it matters
+
+Networks fail and clients retry. For payments or order creation, accept an `Idempotency-Key` header and store the result, so a retried request returns the same response instead of charging twice.
+
+## Wrapping up
+
+Good API design is mostly consistency: the same naming, the same errors, the same pagination everywhere. Your future self, and every developer using your API, will thank you.

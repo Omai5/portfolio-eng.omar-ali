@@ -8,8 +8,10 @@ import {
 } from "@/components/ui/popover";
 import { motion } from "framer-motion";
 
-import { SocketContext } from "@/contexts/socketio";
-import { Users, Users2, Hash, Settings } from "lucide-react";
+import { SocketContext, type Message, type User } from "@/contexts/socketio";
+import { config } from "@/data/config";
+import { Users, Users2, Hash, Settings, MessageCircle } from "lucide-react";
+import { FaWhatsapp } from "react-icons/fa";
 import { cn } from "@/lib/utils";
 
 import { useChatScroll } from "./hooks/use-chat-scroll";
@@ -22,14 +24,65 @@ import { EditProfileModal } from "./components/edit-profile-modal";
 import { THEME } from "./constants";
 import { getAvatarUrl } from "@/lib/avatar";
 
+// Used when there is no realtime server (NEXT_PUBLIC_WS_URL unset): the widget
+// becomes a direct line to the owner. Messages are emailed via /api/chat and an
+// automatic reply shares the phone, email and WhatsApp links.
+const VISITOR_ID = "local-visitor";
+const OWNER_ID = "local-owner";
+
+const contactLines = [
+  `📞 Phone: ${config.phone}`,
+  `✉️ Email: ${config.email}`,
+  `💬 WhatsApp: ${config.whatsapp}`,
+].join("\n");
+
+const makeMsg = (
+  sessionId: string,
+  username: string,
+  avatar: string,
+  color: string,
+  content: string
+): Message => ({
+  id: `${sessionId}-${Date.now()}-${Math.random().toString(36).slice(2)}`,
+  sessionId,
+  username,
+  avatar,
+  color,
+  content,
+  flag: "",
+  country: "",
+  createdAt: new Date(),
+});
+
 const OnlineUsers = () => {
-  const { socket, users: _users, msgs } = useContext(SocketContext);
-  const users = Array.from(_users.values());
+  const { socket, users: _users, msgs: socketMsgs } = useContext(SocketContext);
+  const isOffline = !socket;
+  const [localMsgs, setLocalMsgs] = useState<Message[]>([]);
+  const msgs = isOffline ? localMsgs : socketMsgs;
+
+  const visitor: User = {
+    id: VISITOR_ID,
+    socketId: "",
+    name: "You",
+    avatar: "visitor",
+    color: "#60a5fa",
+    isOnline: "true",
+    posX: 0,
+    posY: 0,
+    location: "",
+    flag: "",
+    lastSeen: "",
+    createdAt: "",
+  };
+
+  const users = isOffline ? [] : Array.from(_users.values());
   const [showUserList, setShowUserList] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
   const [isEditingProfile, setIsEditingProfile] = useState(false);
 
-  const currentUser = users.find(u => u.socketId === socket?.id);
+  const currentUser = isOffline
+    ? visitor
+    : users.find(u => u.socketId === socket?.id);
   const { playSendSound, playReceiveSound } = useSounds();
   const prevMsgsLength = useRef(msgs.length);
 
@@ -81,10 +134,42 @@ const OnlineUsers = () => {
     isAtBottomRef.current
   );
 
-  const sendMessage = (msg: string) => {
-    socket?.emit("msg-send", {
-      content: msg,
-    });
+  const sendMessage = async (msg: string) => {
+    if (!isOffline) {
+      socket?.emit("msg-send", {
+        content: msg,
+      });
+      return;
+    }
+
+    setLocalMsgs((p) => [
+      ...p,
+      makeMsg(VISITOR_ID, visitor.name, visitor.avatar, visitor.color, msg),
+    ]);
+
+    let delivered = false;
+    try {
+      const res = await fetch("/api/chat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ message: msg }),
+      });
+      delivered = res.ok;
+    } catch {
+      delivered = false;
+    }
+
+    const reply = delivered
+      ? `Thanks for your message! 📩 It went straight to my inbox and I'll get back to you soon.\n\nYou can also reach me directly:\n${contactLines}`
+      : `Sorry, I couldn't deliver your message right now 😕 Please reach me directly:\n${contactLines}`;
+
+    // Small pause so the reply feels like a reply
+    setTimeout(() => {
+      setLocalMsgs((p) => [
+        ...p,
+        makeMsg(OWNER_ID, config.author, "Omar", "#a855f7", reply),
+      ]);
+    }, 700);
   };
 
   const updateProfile = ({ name, avatar, color }: { name: string; avatar: string, color?: string }) => {
@@ -136,12 +221,14 @@ const OnlineUsers = () => {
                 <Users2 className="w-6 h-6" />
               </div>
 
-              <span className={cn(
-                "absolute -top-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full text-[10px] font-bold transition-colors",
-                unreads > 0 ? "bg-green-500 text-white" : "bg-red-500 text-white"
-              )}>
-                {unreads > 0 ? unreads : users.length}
-              </span>
+              {(!isOffline || unreads > 0) && (
+                <span className={cn(
+                  "absolute -top-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full text-[10px] font-bold transition-colors",
+                  unreads > 0 ? "bg-green-500 text-white" : "bg-red-500 text-white"
+                )}>
+                  {unreads > 0 ? unreads : users.length}
+                </span>
+              )}
             </div>
           </Button>
         </PopoverTrigger>
@@ -156,9 +243,29 @@ const OnlineUsers = () => {
           {/* Header */}
           <div className={cn("h-12 flex items-center justify-between px-4 shadow-sm border-b shrink-0", THEME.bg.secondary, THEME.border.primary)}>
             <div className={cn("flex items-center gap-2 font-semibold", THEME.text.header)}>
-              <Hash className={cn("w-5 h-5", THEME.text.secondary)} />
-              <span>general</span>
+              {isOffline ? (
+                <>
+                  <MessageCircle className={cn("w-5 h-5", THEME.text.secondary)} />
+                  <span>Chat with {config.author.split(" ")[0]}</span>
+                </>
+              ) : (
+                <>
+                  <Hash className={cn("w-5 h-5", THEME.text.secondary)} />
+                  <span>general</span>
+                </>
+              )}
             </div>
+            {isOffline ? (
+              <a
+                href={config.whatsapp}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-1.5 rounded-md bg-green-600 hover:bg-green-700 px-2.5 py-1 text-xs font-semibold text-white transition-colors"
+              >
+                <FaWhatsapp className="h-4 w-4" />
+                WhatsApp
+              </a>
+            ) : (
             <div className="flex items-center gap-2">
               {currentUser && (
                 <Button
@@ -209,6 +316,7 @@ const OnlineUsers = () => {
                 <Users className="w-5 h-5" />
               </Button>
             </div>
+            )}
           </div>
 
           <div className={cn("relative flex flex-col flex-1", THEME.bg.primary)}>
@@ -223,12 +331,13 @@ const OnlineUsers = () => {
               isSingleUser={isSingleUser}
               typingUsers={typingUsers}
               getTypingText={getTypingText}
+              offline={isOffline}
             />
 
             <ChatInput
               onSendMessage={sendMessage}
               onTyping={handleTyping}
-              placeholder="Message #general"
+              placeholder={isOffline ? "Write me a message..." : "Message #general"}
             />
 
             <UserList
@@ -244,7 +353,7 @@ const OnlineUsers = () => {
         </PopoverContent>
       </Popover>
 
-      {currentUser && (
+      {currentUser && !isOffline && (
         <EditProfileModal
           user={currentUser}
           isOpen={isEditingProfile}

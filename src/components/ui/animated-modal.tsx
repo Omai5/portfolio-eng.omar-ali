@@ -9,7 +9,7 @@ import React, {
   useRef,
   useState,
 } from "react";
-import { ScrollArea } from "./scroll-area";
+import { createPortal } from "react-dom";
 
 interface ModalContextType {
   open: boolean;
@@ -68,28 +68,34 @@ export const ModalBody = ({
   children: ReactNode;
   className?: string;
 }) => {
-  const { open } = useModal();
+  const { open, setOpen } = useModal();
+
+  // Portal target only exists in the browser
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
 
   useEffect(() => {
-    if (typeof window !== "undefined") {
-      document.addEventListener("keydown", (e) => {
-        if (e.key === "Escape") setOpen(false);
-      });
-    }
-  }, []);
-  useEffect(() => {
-    if (open) {
-      document.body.style.overflow = "hidden";
-    } else {
-      document.body.style.overflow = "auto";
-    }
-  }, [open]);
+    if (!open) return;
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setOpen(false);
+    };
+    document.addEventListener("keydown", onKeyDown);
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.removeEventListener("keydown", onKeyDown);
+      document.body.style.overflow = "";
+    };
+  }, [open, setOpen]);
 
   const modalRef = useRef(null);
-  const { setOpen } = useModal();
   useOutsideClick(modalRef, () => setOpen(false));
 
-  return (
+  if (!mounted) return null;
+
+  // Rendered into <body> so transformed ancestors (e.g. the scroll-scaled
+  // SectionWrapper) can't trap the fixed overlay and let clicks reach the
+  // cards behind it.
+  return createPortal(
     <AnimatePresence>
       {open && (
         <motion.div
@@ -111,7 +117,7 @@ export const ModalBody = ({
           <motion.div
             ref={modalRef}
             className={cn(
-              "min-h-[50%] max-h-[90%] md:max-w-[40%] bg-white dark:bg-neutral-950 border border-transparent dark:border-neutral-800 md:rounded-2xl relative z-50 flex flex-col flex-1 overflow-hidden",
+              "w-[calc(100%-2rem)] max-h-[85dvh] md:max-w-[40%] bg-white dark:bg-neutral-950 border border-transparent dark:border-neutral-800 rounded-2xl relative z-50 flex flex-col overflow-hidden",
               className
             )}
             initial={{
@@ -138,13 +144,18 @@ export const ModalBody = ({
             }}
           >
             <CloseIcon />
-            <ScrollArea className="h-[80dvh] w-full rounded-md border">
+            {/* Height follows content up to max-h; footer stays pinned while body scrolls */}
+            <div
+              data-lenis-prevent
+              className="flex-1 min-h-0 w-full overflow-y-auto overscroll-contain"
+            >
               {children}
-            </ScrollArea>
+            </div>
           </motion.div>
         </motion.div>
       )}
-    </AnimatePresence>
+    </AnimatePresence>,
+    document.body
   );
 };
 
@@ -172,7 +183,7 @@ export const ModalFooter = ({
   return (
     <div
       className={cn(
-        "flex justify-end p-4 bg-gray-100 dark:bg-neutral-900",
+        "sticky bottom-0 flex justify-end p-4 bg-gray-100 dark:bg-neutral-900",
         className
       )}
     >
@@ -207,7 +218,7 @@ const CloseIcon = () => {
   return (
     <button
       onClick={() => setOpen(false)}
-      className="absolute top-4 right-4 group z-[9999]"
+      className="absolute top-3 right-3 p-2 group z-[9999]"
     >
       <svg
         xmlns="http://www.w3.org/2000/svg"

@@ -87,20 +87,18 @@ const HeroSection = () => {
 
               <div className="mt-8 flex flex-col gap-3 w-fit">
 
-                {/* Resume
-                    Temporarily disabled until the CV is ready */}
+                {/* Resume */}
                 <div className="flex-1">
                   <BoxReveal delay={2} width="100%">
-                    <Button
-                      type="button"
-                      disabled
-                      className="flex items-center gap-2 w-full"
-                    >
-                      <File size={24} />
-                      <p>Resume</p>
-                    </Button>
-                  </BoxReveal>
+                    <Link href="https://drive.google.com/file/d/13vSOcksJZnyVZDZTUGDqkQRQnruIiI35/view?usp=sharing" target="_blank" rel="noopener noreferrer">
+                  <Button className="flex items-center gap-2 w-full">
+                    <File size={24} />
+                  <p>Resume</p>
+                  </Button>
+                    </Link>
+                </BoxReveal>
                 </div>
+
 
                 {/* Actions */}
                 <div className="md:self-start flex gap-3">

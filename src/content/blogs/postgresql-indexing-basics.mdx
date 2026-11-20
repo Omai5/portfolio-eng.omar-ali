@@ -1,0 +1,91 @@
+---
+title: "PostgreSQL Indexing: Making Slow Queries Fast"
+publishedAt: "2026-11-02"
+summary: "A practical introduction to PostgreSQL indexes: how to find slow queries, read EXPLAIN ANALYZE, and choose the right index."
+author: "Omar Ali"
+tags: ["PostgreSQL", "Databases", "Performance"]
+---
+
+Most backend performance problems I have seen were not in the code. They were a missing index. Here is how I find and fix them.
+
+## Start by measuring
+
+Never guess. Run the slow query with `EXPLAIN ANALYZE`:
+
+```sql
+EXPLAIN ANALYZE
+SELECT * FROM orders
+WHERE customer_id = 1234
+ORDER BY created_at DESC
+LIMIT 20;
+```
+
+If you see `Seq Scan on orders` on a large table, PostgreSQL is reading **every row** to find a few. That is the signal you need an index.
+
+## The basic B-tree index
+
+```sql
+CREATE INDEX idx_orders_customer ON orders (customer_id);
+```
+
+Now PostgreSQL jumps straight to the matching rows with an `Index Scan`. On a table with millions of rows, this can turn seconds into milliseconds.
+
+## Composite indexes: column order matters
+
+The query above filters by `customer_id` **and** sorts by `created_at`. One composite index covers both:
+
+```sql
+CREATE INDEX idx_orders_customer_created
+  ON orders (customer_id, created_at DESC);
+```
+
+The rule: put columns used for **equality** first, then columns used for **ranges or sorting**. An index on `(customer_id, created_at)` helps queries filtering by `customer_id`, but not queries filtering only by `created_at`.
+
+## Partial indexes for hot subsets
+
+If most queries only look at active rows, index only those:
+
+```sql
+CREATE INDEX idx_orders_pending
+  ON orders (created_at)
+  WHERE status = 'pending';
+```
+
+The index is smaller, faster, and cheaper to maintain.
+
+## Indexes are not free
+
+Every index:
+
+- takes disk space,
+- slows down `INSERT`, `UPDATE`, and `DELETE`, because the index must be updated too.
+
+So index what your queries actually use. You can find unused indexes with:
+
+```sql
+SELECT relname AS table, indexrelname AS index, idx_scan
+FROM pg_stat_user_indexes
+WHERE idx_scan = 0;
+```
+
+## Create indexes safely in production
+
+A normal `CREATE INDEX` locks the table against writes. On a live system, use:
+
+```sql
+CREATE INDEX CONCURRENTLY idx_orders_customer ON orders (customer_id);
+```
+
+It takes longer but keeps your application running.
+
+## My checklist
+
+1. Find slow queries (`pg_stat_statements` is great for this).
+2. Run `EXPLAIN ANALYZE` and look for sequential scans on big tables.
+3. Add the smallest index that covers the filter and sort.
+4. Measure again.
+5. Remove indexes that are never used.
+
+## Wrapping up
+
+Indexes are the highest-leverage performance tool in a relational database. Measure first, index deliberately, and your database will scale much further than you expect.

@@ -7,12 +7,15 @@ import {
   ModalContent,
   ModalFooter,
   ModalTrigger,
+  useModal,
 } from "../ui/animated-modal";
 import { FloatingDock } from "../ui/floating-dock";
 import Link from "next/link";
+import { Lock } from "lucide-react";
+import ProjectCover from "../ui/project-cover";
 
 import SmoothScroll from "../smooth-scroll";
-import projects, { Project } from "@/data/projects";
+import projects, { Project, Skill } from "@/data/projects";
 import { cn } from "@/lib/utils";
 import { SectionHeader } from "./section-header";
 
@@ -20,12 +23,12 @@ import SectionWrapper from "../ui/section-wrapper";
 
 const ProjectsSection = () => {
   return (
-    <SectionWrapper id="projects" className="max-w-7xl mx-auto md:h-[130dvh]">
+    <SectionWrapper id="projects" className="max-w-7xl mx-auto md:min-h-[130dvh]">
       <SectionHeader id='projects' title="Projects" />
       {projects.length > 0 ? (
-        <div className="grid grid-cols-1 md:grid-cols-3">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-y-8">
           {projects.map((project) => (
-            <Modall key={project.src} project={project} />
+            <Modall key={project.id} project={project} />
           ))}
         </div>
       ) : (
@@ -44,16 +47,28 @@ const Modall = ({ project }: { project: Project }) => {
       <Modal>
         <ModalTrigger className="bg-transparent flex justify-center group/modal-btn">
           <div
-            className="relative w-[90vw] sm:w-[350px] md:w-[400px] h-auto rounded-lg overflow-hidden mx-auto"
+            className="relative w-[calc(100vw-3rem)] sm:w-[350px] md:w-[400px] h-auto rounded-lg overflow-hidden mx-auto"
             style={{ aspectRatio: "3/2" }}
           >
-            <Image
-              className="absolute w-full h-full top-0 left-0 hover:scale-[1.05] transition-all"
-              src={project.src}
-              alt={project.title}
-              width={300}
-              height={300}
-            />
+            {project.src ? (
+              <Image
+                className="absolute w-full h-full top-0 left-0 object-cover hover:scale-[1.05] transition-all"
+                src={project.src}
+                alt={project.title}
+                width={400}
+                height={267}
+              />
+            ) : (
+              <ProjectCover
+                project={project}
+                className="hover:scale-[1.05] transition-all"
+              />
+            )}
+            {project.comingSoon && (
+              <div className="absolute top-3 right-3 z-10 rounded-full bg-amber-400 px-2.5 py-0.5 text-xs font-semibold text-black">
+                Coming Soon
+              </div>
+            )}
             <div className="absolute w-full h-1/2 bottom-0 left-0 bg-gradient-to-t from-black via-black/85 to-transparent pointer-events-none">
               <div className="flex flex-col h-full items-start justify-end p-6">
                 <div className="text-lg text-left">{project.title}</div>
@@ -64,28 +79,44 @@ const Modall = ({ project }: { project: Project }) => {
             </div>
           </div>
         </ModalTrigger>
-        <ModalBody className="md:max-w-4xl md:max-h-[80%] overflow-auto">
+        <ModalBody className="md:max-w-4xl md:max-h-[80%]">
           <SmoothScroll isInsideModal={true}>
-            <ModalContent>
+            <ModalContent className="pt-10">
               <ProjectContents project={project} />
             </ModalContent>
           </SmoothScroll>
-          <ModalFooter className="gap-4">
-            <button className="px-2 py-1 bg-gray-200 text-black dark:bg-black dark:border-black dark:text-white border border-gray-300 rounded-md text-sm w-28">
-              Cancel
-            </button>
+          <ModalFooter className="gap-3">
+            <CancelButton />
+            {project.comingSoon && (
+              <button
+                type="button"
+                disabled
+                aria-disabled="true"
+                title="This project is still in progress"
+                className="flex-1 sm:flex-none sm:w-28 inline-flex items-center justify-center gap-1.5 bg-neutral-300 text-neutral-500 dark:bg-neutral-800 dark:text-neutral-500 text-sm px-2 py-2 rounded-md border border-neutral-300 dark:border-neutral-700 cursor-not-allowed"
+              >
+                <Lock size={14} />
+                Visit
+              </button>
+            )}
             {project.live && (
-              <Link href={project.live} target="_blank">
-                <button className="bg-black text-white dark:bg-white dark:text-black text-sm px-2 py-1 rounded-md border border-black w-28">
-                  Visit
-                </button>
+              <Link
+                href={project.live}
+                target="_blank"
+                rel="noreferrer"
+                className="flex-1 sm:flex-none sm:w-28 text-center bg-black text-white dark:bg-white dark:text-black text-sm px-2 py-2 rounded-md border border-black"
+              >
+                Visit
               </Link>
             )}
             {project.github && (
-              <Link href={project.github} target="_blank">
-                <button className="bg-black text-white dark:bg-white dark:text-black text-sm px-2 py-1 rounded-md border border-black w-28">
-                  GitHub
-                </button>
+              <Link
+                href={project.github}
+                target="_blank"
+                rel="noreferrer"
+                className="flex-1 sm:flex-none sm:w-28 text-center bg-black text-white dark:bg-white dark:text-black text-sm px-2 py-2 rounded-md border border-black"
+              >
+                GitHub
               </Link>
             )}
           </ModalFooter>
@@ -97,27 +128,36 @@ const Modall = ({ project }: { project: Project }) => {
 export default ProjectsSection;
 
 const ProjectContents = ({ project }: { project: Project }) => {
+  if (project.comingSoon) {
+    return (
+      <div className="flex flex-col items-center text-center gap-4 py-10">
+        <h4 className="text-lg md:text-2xl text-neutral-600 dark:text-neutral-100 font-bold">
+          {project.title}
+        </h4>
+        <span className="rounded-full bg-amber-400 px-3 py-1 text-sm font-semibold text-black">
+          Coming Soon 🚧
+        </span>
+        <p className="max-w-md font-sans text-sm md:text-base text-neutral-600 dark:text-neutral-300">
+          I&apos;m currently working on this project. It will be available
+          here soon. Stay tuned!
+        </p>
+      </div>
+    );
+  }
+
+  const frontend = project.skills?.frontend ?? [];
+  const backend = project.skills?.backend ?? [];
   return (
     <>
       <h4 className="text-lg md:text-2xl text-neutral-600 dark:text-neutral-100 font-bold text-center mb-8">
         {project.title}
       </h4>
-      <div className="flex flex-col md:flex-row md:justify-evenly max-w-screen overflow-hidden md:overflow-visible">
-        <div className="flex flex-row md:flex-col-reverse justify-center items-center gap-2 text-3xl mb-8">
-          <p className="text-sm mt-1 text-neutral-600 dark:text-neutral-500">
-            Frontend
-          </p>
-          {project.skills.frontend?.length > 0 && (
-            <FloatingDock items={project.skills.frontend} />
-          )}
-        </div>
-        {project.skills.backend?.length > 0 && (
-          <div className="flex flex-row md:flex-col-reverse justify-center items-center gap-2 text-3xl mb-8">
-            <p className="text-sm mt-1 text-neutral-600 dark:text-neutral-500">
-              Backend
-            </p>
-            <FloatingDock items={project.skills.backend} />
-          </div>
+      <div className="flex flex-col md:flex-row md:justify-evenly gap-6 mb-8">
+        {frontend.length > 0 && (
+          <SkillGroup label="Frontend" skills={frontend} />
+        )}
+        {backend.length > 0 && (
+          <SkillGroup label="Backend" skills={backend} />
         )}
       </div>
       {/* <div className="flex justify-center items-center">
@@ -149,7 +189,42 @@ const ProjectContents = ({ project }: { project: Project }) => {
           </motion.div>
         ))}
       </div> */}
-      {project.content}
+      <div className="font-sans text-sm md:text-base">{project.content}</div>
     </>
+  );
+};
+
+// The hover dock relies on a mouse, so touch screens get labeled chips instead
+const SkillGroup = ({ label, skills }: { label: string; skills: Skill[] }) => {
+  return (
+    <div className="flex flex-col md:flex-col-reverse items-center gap-3">
+      <p className="text-sm text-neutral-600 dark:text-neutral-500">{label}</p>
+      <div className="hidden md:block">
+        <FloatingDock items={skills} />
+      </div>
+      <div className="flex md:hidden flex-wrap justify-center gap-2">
+        {skills.map((skill) => (
+          <span
+            key={skill.title}
+            className="inline-flex items-center gap-1.5 rounded-full bg-neutral-100 dark:bg-neutral-800 px-3 py-1.5 text-xs font-sans text-neutral-700 dark:text-neutral-200 [&_svg]:h-4 [&_svg]:w-4"
+          >
+            {skill.icon}
+            {skill.title}
+          </span>
+        ))}
+      </div>
+    </div>
+  );
+};
+
+const CancelButton = () => {
+  const { setOpen } = useModal();
+  return (
+    <button
+      onClick={() => setOpen(false)}
+      className="flex-1 sm:flex-none sm:w-28 px-2 py-2 bg-gray-200 text-black dark:bg-black dark:border-black dark:text-white border border-gray-300 rounded-md text-sm"
+    >
+      Cancel
+    </button>
   );
 };

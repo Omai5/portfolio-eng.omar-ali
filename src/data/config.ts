@@ -30,6 +30,10 @@ const config = {
   ],
   author: "Omar Ali",
   email: "omar.ali.set@gmail.com",
+  phone: "01044111575",
+  // International format for tel: links (Egypt +20, leading 0 dropped)
+  phoneIntl: "+201044111575",
+  whatsapp: "https://wa.me/message/F6DSJPE63QA5J1",
   site: "https://github.com/Omai5/Omai5",
 
   githubUsername: "Omai5",
